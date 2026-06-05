@@ -1,0 +1,48 @@
+# 🐺 Projeto Wolfy | Assistente de Letramento Digital
+
+> *"Navegue com confiança. O Wolfy te ensina o caminho."*
+
+## 📖 Sobre o Projeto
+
+O **Projeto Wolfy** é uma extensão leve e interativa para navegadores baseados em Chromium. Desenvolvido como Produto Mínimo Viável (MVP) para o Trabalho de Conclusão de Curso (TCC), o assistente tem como objetivo principal promover o letramento digital de usuários iniciantes, oferecendo dicas contextuais e tutoriais guiados em tempo real diretamente na tela do navegador.
+
+---
+
+## ✨ Principais Funcionalidades
+
+* 🎓 **Tour Interativo (Onboarding):** Um guia passo a passo em formato de quadrinhos que apresenta as ferramentas básicas de pesquisa (Barra de Texto, Pesquisa por Voz e Atalho de E-mail).
+* 🚦 **Interceptação Pedagógica de URLs:** Identifica se o usuário tentou "pesquisar" um endereço de site (ex: *facebook.com*) no buscador e ensina proativamente como utilizar a barra de endereços do navegador para um acesso mais rápido.
+* 🧠 **Memória de Preferências (UX):** Utiliza o `chrome.storage.local` para respeitar as escolhas do usuário. Se uma dica for recusada, o Wolfy não voltará a interromper a navegação.
+* ⚡ **Zero Dependências:** Construído inteiramente com Vanilla JavaScript, HTML5 e CSS3, garantindo máxima performance e privacidade (sem chamadas a APIs externas).
+
+---
+
+## 🚀 Como Instalar e Testar (Modo Desenvolvedor)
+
+Para testar a extensão localmente no Google Chrome, Microsoft Edge ou navegadores compatíveis:
+
+1. Faça o clone deste repositório ou baixe a pasta do projeto.
+2. Abra o seu navegador e acesse a página de extensões:
+   * **Chrome:** Digite `chrome://extensions/` na barra de endereços.
+   * **Edge:** Digite `edge://extensions/` na barra de endereços.
+3. No canto superior direito, ative a chave **"Modo do Desenvolvedor"**.
+4. Clique no botão **"Carregar sem compactação"** (ou *Load unpacked*).
+5. Selecione a pasta onde os arquivos do projeto estão salvos.
+6. Pronto! A extensão já está ativa. Acesse o [Google](https://www.google.com) para ver o Wolfy em ação.
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+* **JavaScript (ES6)**
+* **CSS3 (Flexbox & Animações)**
+* **HTML5 (DOM Manipulation)**
+* **Chrome Extension API (Manifest V3)**
+
+---
+
+## 📄 Copyright e Licença
+
+© 2026 Andre Luiz Arnaud dos Santos. Todos os direitos reservados.
+
+Este software é um Produto Mínimo Viável (MVP) desenvolvido com fins acadêmicos e de pesquisa para o curso de Tecnologia em Análise e Desenvolvimento de Sistemas (TADS) do Instituto Federal do Rio Grande do Norte (IFRN) - Campus Natal Central.

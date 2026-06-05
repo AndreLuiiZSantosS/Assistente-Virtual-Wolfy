@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Guia Wolfy - MVP",
+  "version": "0.0.1",
+  "description": "Assistente virtual para letramento digital e segurança.",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["86759.png"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
