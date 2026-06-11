@@ -12,7 +12,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["86759.png"],
+      "resources": ["wolfy.png", "wolfy_cropped.png"],
       "matches": ["<all_urls>"]
     }
   ]
