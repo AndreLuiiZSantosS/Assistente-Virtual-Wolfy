@@ -1,18 +1,25 @@
 {
   "manifest_version": 3,
-  "name": "Guia Wolfy - MVP",
-  "version": "0.0.1",
-  "description": "Assistente virtual para letramento digital e segurança.",
+  "name": "Wolfy - Guia de Letramento Digital",
+  "version": "1.0.0",
+  "description": "Assistente virtual para letramento digital, acessibilidade e prevencao de erros.",
   "permissions": ["storage"],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": ["content.js"],
+      "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["wolfy.png", "wolfy_cropped.png"],
+      "resources": ["wolfy_cropped.png", "wolfy.png"],
       "matches": ["<all_urls>"]
     }
   ]
