@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'browser_page.dart'; 
+import 'package:url_launcher/url_launcher.dart';
+import 'browser_page.dart';
 import '../widgets/wolfy_card.dart';
 
 class HomePage extends StatelessWidget {
@@ -7,200 +8,242 @@ class HomePage extends StatelessWidget {
 
   static const Color wolfyPurple = Color(0xFF7B5CFA);
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 16,
-          ),
-          child: Column(
-            children: [
-              const SizedBox(height: 10),
-
-              // Logo + Nome
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    "assets/wolfy_icon.png",
-                    height: 85,
-                  ),
-                  const SizedBox(width: 12),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Wolfy",
-                        style: TextStyle(
-                          fontSize: 38,
-                          fontWeight: FontWeight.w800,
-                          color: wolfyPurple,
-                        ),
-                      ),
-                      Text(
-                        "Seu guia digital",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.black54,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 35),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Bom dia! 👋",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 6),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "O que deseja fazer hoje?",
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.black54,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 28),
-
-              // CARD NAVEGAR - LIGADO COM A BROWSER PAGE!
-              WolfyCard(
-                icon: Icons.language,
-                iconColor: Colors.blue,
-                title: "Navegar na internet",
-                subtitle: "Acesse qualquer site",
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const BrowserPage()),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-
-              WolfyCard(
-                icon: Icons.school,
-                iconColor: Colors.green,
-                title: "Aprender algo novo",
-                subtitle: "Tutoriais passo a passo",
-                onTap: () {
-                  print("Aprender clicado!");
-                },
-              ),
-              const SizedBox(height: 16),
-
-              WolfyCard(
-                icon: Icons.chat_bubble_outline,
-                iconColor: Colors.lightBlue,
-                title: "Conversar com Wolfy",
-                subtitle: "Tire suas dúvidas",
-                onTap: () {
-                  print("Conversar com Wolfy clicado!");
-                },
-              ),
-              const SizedBox(height: 16),
-
-              WolfyCard(
-                icon: Icons.settings,
-                iconColor: Colors.orange,
-                title: "Configurações",
-                subtitle: "Ajustes do aplicativo",
-                onTap: () {
-                  print("Configurações clicado!");
-                },
-              ),
-              const SizedBox(height: 40),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        height: 90,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            top: BorderSide(
-              color: Color(0xFFE8E8E8),
-            ),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _navItem(
-              icon: Icons.home,
-              label: "Início",
-              selected: true,
-            ),
-            _navItem(
-              icon: Icons.language,
-              label: "Navegar",
-            ),
-            Container(
-              width: 65,
-              height: 65,
-              decoration: const BoxDecoration(
-                color: wolfyPurple,
-                shape: BoxShape.circle,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Image.asset(
-                  "assets/wolfy_icon.png",
-                ),
-              ),
-            ),
-            _navItem(
-              icon: Icons.menu_book,
-              label: "Aprender",
-            ),
-            _navItem(
-              icon: Icons.bar_chart,
-              label: "Progresso",
-            ),
-          ],
+  // === NAVEGAÇÃO SEGURA ===
+  void _navegarParaSiteSeguro(BuildContext context, String title, String url, List<String> whitelist) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BrowserPage(
+          initialUrl: url,
+          pageTitle: title,
+          allowedDomains: whitelist,
         ),
       ),
     );
   }
 
-  Widget _navItem({
-    required IconData icon,
-    required String label,
-    bool selected = false,
-  }) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          icon,
-          size: 28,
-          color: selected ? wolfyPurple : Colors.black45,
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: selected ? wolfyPurple : Colors.black45,
+  // === GAVETA DE PLANOS DE SAÚDE ===
+  void _mostrarOpcoesSaude(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Qual é o seu plano ou médico?",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+              ),
+              const SizedBox(height: 20),
+              _opcaoGiganteSaude(context, "Unimed", Colors.green.shade700, Icons.local_hospital, "https://www.unimed.coop.br", ["unimed.coop.br"]),
+              const SizedBox(height: 12),
+              _opcaoGiganteSaude(context, "Hapvida", Colors.blue.shade800, Icons.health_and_safety, "https://www.hapvida.com.br", ["hapvida.com.br"]),
+              const SizedBox(height: 12),
+              _opcaoGiganteSaude(context, "Amil", Colors.teal.shade600, Icons.medical_services, "https://www.amil.com.br", ["amil.com.br"]),
+              const SizedBox(height: 12),
+              _opcaoGiganteSaude(context, "Meu SUS Digital", Colors.blue.shade600, Icons.badge, "https://meususdigital.saude.gov.br", ["saude.gov.br"]),
+              const SizedBox(height: 20),
+            ],
           ),
+        );
+      },
+    );
+  }
+
+  Widget _opcaoGiganteSaude(BuildContext context, String nome, Color cor, IconData icone, String url, List<String> whitelist) {
+    return SizedBox(
+      width: double.infinity,
+      height: 65,
+      child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: cor.withOpacity(0.1),
+          foregroundColor: cor,
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
         ),
-      ],
+        icon: Icon(icone, size: 28),
+        label: Text(nome, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        onPressed: () {
+          Navigator.pop(context); // Fecha a gaveta
+          _navegarParaSiteSeguro(context, nome, url, whitelist);
+        },
+      ),
+    );
+  }
+
+  // === FUNÇÃO SOS (WhatsApp) ===
+  Future<void> _dispararSOS() async {
+    const String numeroDeEmergencia = "5584999999999"; 
+    final Uri whatsappUrl = Uri.parse(
+      "https://wa.me/$numeroDeEmergencia?text=Oi!%20Sou%20o%20Wolfy.%20Preciso%20de%20ajuda%20urgente!",
+    );
+
+    if (await canLaunchUrl(whatsappUrl)) {
+      await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
+    } else {
+      debugPrint("Não foi possível abrir o WhatsApp");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // SIMULAÇÃO DO ONBOARDING
+    const String nomeUsuario = "Andre";
+    const String estadoUsuario = "RN"; 
+
+    // Lógica Geográfica
+    late final String urlAgua;
+    late final String urlLuz;
+    late final List<String> whitelistGeografica;
+
+    if (estadoUsuario == "RN") {
+      urlAgua = "https://caern.rn.gov.br";
+      urlLuz = "https://www.neoenergiacosern.com.br";
+      whitelistGeografica = ["caern.rn.gov.br", "neoenergiacosern.com.br", "neoenergia.com"];
+    } else if (estadoUsuario == "SP") {
+      urlAgua = "https://agenciavirtual.sabesp.com.br";
+      urlLuz = "https://www.enel.com.br";
+      whitelistGeografica = ["sabesp.com.br", "enel.com.br", "enel.com"];
+    } else {
+      urlAgua = "https://www.google.com";
+      urlLuz = "https://www.google.com";
+      whitelistGeografica = ["google.com"];
+    }
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FC),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Olá, $nomeUsuario! 👋",
+                            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.black87),
+                          ),
+                          const Text(
+                            "Eu sou o Wolfy, o teu guia digital.",
+                            style: TextStyle(fontSize: 16, color: Colors.black54, fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                      Image.asset("assets/wolfy_icon.png", height: 75),
+                    ],
+                  ),
+
+                  const SizedBox(height: 35),
+                  const Text(
+                    "O que desejas fazer hoje?",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // === O BOTÃO INTOCÁVEL (Navegação Livre) ===
+                  WolfyCard(
+                    icon: Icons.public,
+                    iconColor: wolfyPurple,
+                    title: "Navegar na Internet",
+                    subtitle: "Pesquisar no Google e ver sites.",
+                    onTap: () => _navegarParaSiteSeguro(
+                      context,
+                      "Navegador Wolfy",
+                      "https://www.google.com.br",
+                      [""], // String vazia libera qualquer site nesse modo!
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // === BOTÕES DE INTENÇÕES ESPECÍFICAS ===
+                  WolfyCard(
+                    icon: Icons.shopping_basket,
+                    iconColor: Colors.green,
+                    title: "Quero fazer compras",
+                    subtitle: "Ir para lojas oficiais e seguras.",
+                    onTap: () => _navegarParaSiteSeguro(
+                      context,
+                      "Compras Seguras",
+                      "https://www.mercadolivre.com.br",
+                      ["mercadolivre.com.br", "mercadopago.com.br"],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  WolfyCard(
+                    icon: Icons.favorite,
+                    iconColor: Colors.red,
+                    title: "Quero ver a minha Saúde",
+                    subtitle: "Planos de saúde, boletos e exames.",
+                    onTap: () => _mostrarOpcoesSaude(context),
+                  ),
+                  const SizedBox(height: 16),
+
+                  WolfyCard(
+                    icon: Icons.water_drop,
+                    iconColor: Colors.blue,
+                    title: "Segunda Via da Água",
+                    subtitle: "Boleto da companhia de água.",
+                    onTap: () => _navegarParaSiteSeguro(context, "Conta da Água", urlAgua, whitelistGeografica),
+                  ),
+                  const SizedBox(height: 16),
+
+                  WolfyCard(
+                    icon: Icons.lightbulb,
+                    iconColor: Colors.amber.shade800,
+                    title: "Segunda Via da Luz",
+                    subtitle: "Boleto da companhia elétrica.",
+                    onTap: () => _navegarParaSiteSeguro(context, "Conta da Luz", urlLuz, whitelistGeografica),
+                  ),
+
+                  const SizedBox(height: 100), // Espaço para o botão flutuante
+                ],
+              ),
+            ),
+
+            // BOTÃO SOS
+            Positioned(
+              bottom: 24,
+              left: 24,
+              right: 24,
+              child: SizedBox(
+                width: double.infinity,
+                height: 65,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: wolfyPurple,
+                    foregroundColor: Colors.white,
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  ),
+                  icon: const Icon(Icons.sos_outlined, size: 30),
+                  label: const Text(
+                    "EMERGÊNCIA / SOCORRO",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: _dispararSOS,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

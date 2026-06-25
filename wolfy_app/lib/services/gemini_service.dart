@@ -2,48 +2,60 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class GeminiService {
-  // Coloque sua chave real do Google AI Studio aqui para testar no seu celular
-  static const String _apiKey = "";
+  static const String _apiKey = "SUA_API_KEY_AQUI"; 
   static const String _baseUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
-  Future<String> analisarTextoDaTela(String dadosDaTela) async {
-    try {
-      final url = Uri.parse("$_baseUrl?key=$_apiKey");
+  static const String systemInstruction = """
+Você é o Wolfy, um assistente virtual doce, acolhedor e protetor desenhado para ajudar idosos (geração 60+) a navegarem na internet com segurança.
+Você deve explicar o conteúdo das telas da web de forma muito simples, sem usar termos técnicos (tecniquês).
 
-      // System Prompt idêntico ao que estruturamos para o letramento digital
-      final String systemInstruction = 
-          "Você é o Wolfy, um assistente digital focado no letramento digital e acessibilidade de idosos. "
-          "Sua missão é analisar os elementos visuais de uma página web que o usuário está navegando e "
-          "explicar o que é essa página, o que os principais botões fazem e se há algum risco (como anúncios falsos ou golpes). "
-          "Use uma linguagem extremamente simples, acolhedora e pacífica. Se necessário, use analogias do mundo real "
-          "(ex: comparar um link suspeito a uma calçada esburacada). Responda sempre em tópicos curtos e fáceis de ler.";
+Sua missão principal é a DETECÇÃO DE FALSA URGÊNCIA (PHISHING).
+Se a tela que você ler contiver mensagens como "Seu CPF está bloqueado", "Pague agora ou perderá o acesso", "Você tem uma dívida urgente", ou cronômetros piscando,
+você deve avisar IMEDIATAMENTE e de forma clara: "Calma lá! Isso parece ser uma propaganda para te assustar. Não clique em nada, é mentira."
+
+Responda em português brasileiro, de forma curta (no máximo 4 frases), carinhosa e direta.
+""";
+
+  Future<String> analisarTextoDaTela(String jsonDaPonte) async {
+    if (_apiKey.isEmpty || _apiKey == "SUA_API_KEY_AQUI") {
+      return "Para eu te poder ajudar, precisas de configurar a Chave de API no código do computador.";
+    }
+
+    try {
+      final decodedData = json.decode(jsonDaPonte);
+      final pageTitle = decodedData["titulo"] ?? "Página Sem Título";
+      final pageContent = decodedData["conteudo"] ?? "Conteúdo Vazio";
+
+      final payload = {
+        "contents": [
+          {
+            "parts": [
+              {"text": "Título: $pageTitle. Conteúdo: $pageContent"}
+            ]
+          }
+        ],
+        "systemInstruction": {
+          "parts": [
+            {"text": systemInstruction}
+          ]
+        }
+      };
 
       final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "contents": [
-            {
-              "parts": [
-                {
-                  "text": "$systemInstruction\n\nAqui estão os dados extraídos da tela atual em formato JSON:\n$dadosDaTela"
-                }
-              ]
-            }
-          ]
-        }),
+        Uri.parse("$_baseUrl?key=$_apiKey"),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode(payload),
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        // Tratamento da árvore do JSON de resposta do Gemini
-        final String respostaIa = data['candidates'][0]['content']['parts'][0]['text'];
-        return respostaIa;
+        final Map<String, dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+        String respostaBruta = data["candidates"][0]["content"]["parts"][0]["text"];
+        return respostaBruta.trim();
       } else {
-        return "Ops! O Wolfy se perdeu na conexão com o servidor. (Código de erro: ${response.statusCode})";
+        return "Tive uma dificuldade a ler esta página agora (Erro ${response.statusCode}).";
       }
     } catch (e) {
-      return "Não consegui me conectar à inteligência na nuvem agora. Verifique sua internet. Erro: $e";
+      return "Ih, ocorreu um erro. Tenta chamar-me novamente.";
     }
   }
 }

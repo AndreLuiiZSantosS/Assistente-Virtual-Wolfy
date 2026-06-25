@@ -11,14 +11,21 @@ class WolfyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Assistente Virtual Wolfy',
       debugShowCheckedModeBanner: false,
-      title: 'Wolfy',
       theme: ThemeData(
+        // Tema Material 3 limpo e moderno
         useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFFF6F7FB),
-        fontFamily: 'Roboto',
+        colorSchemeSeed: const Color(0xFF7B5CFA), // Purple Wolfy
+        scaffoldBackgroundColor: const Color(0xFFF8F9FC),
+        // Fontes grandes e legíveis (Seção para TCC)
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
+          bodyLarge: TextStyle(fontSize: 18),
+          bodyMedium: TextStyle(fontSize: 16),
+        ),
       ),
-      home: const HomePage(),
+      home: const HomePage(), // Começa direto no dashboard de intenções
     );
   }
 }
